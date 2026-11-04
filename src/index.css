@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  }
+}
+
+.font-script {
+  font-family: 'Caveat', cursive;
+}
+
+.font-brand {
+  font-family: 'Fredoka', 'Plus Jakarta Sans', sans-serif;
+}

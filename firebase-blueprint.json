@@ -1,0 +1,213 @@
+{
+  "entities": {
+    "AdminRole": {
+      "title": "AdminRole",
+      "description": "Dynamic administrative roles and permissions for CineNest Studio",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "User email address"
+        },
+        "name": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Display name of the administrator"
+        },
+        "role": {
+          "type": "string",
+          "enum": ["super_admin", "admin", "production_admin", "social_admin", "editor", "viewer"],
+          "description": "Role with specific permission boundaries"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["active", "invited", "suspended"],
+          "description": "Status of the user account"
+        },
+        "assignedModules": {
+          "type": "array",
+          "description": "List of studio modules accessible by the administrator"
+        },
+        "lastActive": {
+          "type": "string",
+          "description": "Timestamp or human-readable relative string of last activity"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "ISO timestamp of last update"
+        }
+      },
+      "required": ["email", "role", "status"]
+    },
+    "ProductionEpisode": {
+      "title": "ProductionEpisode",
+      "description": "Production state and metadata for CineNest Studio 105 episodes",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "description": "Episode sequential index 1 to 105"
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 150,
+          "description": "Title of the episode"
+        },
+        "theme": {
+          "type": "string",
+          "maxLength": 200,
+          "description": "Preschool theme or developmental focus"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["draft", "scripted", "storyboarded", "rendered", "social_ready", "published"],
+          "description": "Pipeline production stage"
+        },
+        "runtimeSeconds": {
+          "type": "integer",
+          "description": "Strict target runtime (330 seconds)"
+        },
+        "hasRunwayShot": {
+          "type": "boolean",
+          "description": "Flag indicating if 3D CGI video shot is generated"
+        },
+        "driveFolderSynced": {
+          "type": "boolean",
+          "description": "Flag indicating if files are synchronized to Google Drive"
+        },
+        "socialCutsReady": {
+          "type": "boolean",
+          "description": "Flag indicating if 9:16/16:9 viral cuts are exported"
+        },
+        "publishedChannels": {
+          "type": "array",
+          "description": "Channels where the episode has been published"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "ISO timestamp of last update"
+        }
+      },
+      "required": ["id", "title", "status", "runtimeSeconds"]
+    },
+    "PublishingQueueItem": {
+      "title": "PublishingQueueItem",
+      "description": "Social cut candidate awaiting Super Admin sign-off",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier"
+        },
+        "episodeId": {
+          "type": "integer",
+          "description": "Linked episode number"
+        },
+        "title": {
+          "type": "string",
+          "description": "Release title"
+        },
+        "platforms": {
+          "type": "array",
+          "description": "Target social platforms (YouTube Shorts, TikTok, Instagram Reels)"
+        },
+        "aspectRatio": {
+          "type": "string",
+          "enum": ["9:16", "16:9", "1:1"],
+          "description": "Framing ratio"
+        },
+        "hookText": {
+          "type": "string",
+          "maxLength": 200,
+          "description": "Viral hook on-screen text"
+        },
+        "caption": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "Post caption and hashtags"
+        },
+        "scheduledTime": {
+          "type": "string",
+          "description": "Scheduled release window"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pending_approval", "approved", "rejected", "published"],
+          "description": "Super admin approval state"
+        },
+        "approvedBy": {
+          "type": "string",
+          "description": "Email of admin who approved the release"
+        },
+        "previewThumbnail": {
+          "type": "string",
+          "description": "URL to preview image"
+        }
+      },
+      "required": ["id", "episodeId", "platforms", "aspectRatio", "status"]
+    },
+    "AudienceComment": {
+      "title": "AudienceComment",
+      "description": "Audience interaction and AI-suggested preschool brand reply",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Comment ID"
+        },
+        "author": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Name or username of audience member"
+        },
+        "platform": {
+          "type": "string",
+          "description": "Originating platform"
+        },
+        "text": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "Original comment content"
+        },
+        "sentiment": {
+          "type": "string",
+          "description": "Detected tone (e.g. positive_learning)"
+        },
+        "suggestedReply": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "Brand response in character voice"
+        },
+        "replyStatus": {
+          "type": "string",
+          "enum": ["pending", "dispatched"],
+          "description": "Approval state of the reply"
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Relative or ISO timestamp"
+        }
+      },
+      "required": ["id", "author", "platform", "text", "replyStatus"]
+    }
+  },
+  "firestore": {
+    "/admins/{adminId}": {
+      "schema": "AdminRole",
+      "description": "Collection of authorized studio administrators and role privileges"
+    },
+    "/episodes/{episodeId}": {
+      "schema": "ProductionEpisode",
+      "description": "Collection of all 105 CineNest studio production episodes"
+    },
+    "/publishingQueue/{queueId}": {
+      "schema": "PublishingQueueItem",
+      "description": "Social cut items awaiting Super Admin approval gate sign-off"
+    },
+    "/comments/{commentId}": {
+      "schema": "AudienceComment",
+      "description": "Multi-platform audience comments and brand replies"
+    }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Remix CineNest Studio — Where Imagination Becomes Animation",
+  "description": "Autonomous 3D cartoon series maker for kids producing Disney-Pixar quality series like Rutti \u0026 Putti, with AI-powered scriptwriting, 3D animation prompts, school curriculum, and full production pipeline.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

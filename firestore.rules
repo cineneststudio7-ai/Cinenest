@@ -1,0 +1,67 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny-all catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSuperAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'cinenest.studio7@gmail.com' ||
+        (exists(/databases/$(database)/documents/admins/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role == 'super_admin')
+      );
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        isSuperAdmin() ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    // Admin Roles collection
+    match /admins/{adminId} {
+      allow get, list: if isSignedIn();
+      allow create, update, delete: if isSuperAdmin();
+    }
+
+    // 105 Episodes Bible & Production State
+    match /episodes/{episodeId} {
+      allow get, list: if true; // Public discovery for viewers & preschool learning academy
+      allow create, update, delete: if isAdmin() && isValidId(episodeId);
+    }
+
+    // Publishing Queue for Social Cuts
+    match /publishingQueue/{queueId} {
+      allow get, list: if isSignedIn();
+      allow create: if isAdmin() && isValidId(queueId);
+      allow update, delete: if isSuperAdmin() && isValidId(queueId);
+    }
+
+    // Audience Comments and Replies
+    match /comments/{commentId} {
+      allow get, list: if isSignedIn();
+      allow create, update, delete: if isAdmin() && isValidId(commentId);
+    }
+  }
+}
